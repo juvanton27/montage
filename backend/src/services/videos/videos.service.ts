@@ -32,22 +32,21 @@ export class VideosService {
           .on('end', () => {
             console.log('Song processing finished !');
             console.log('Merging ...');
-            new fluent_ffmpeg('/Users/juvanton/tmp.mp4')
+            new fluent_ffmpeg()
               .preset(mergingPreset)
               .on('progress', (progress: any) => {
-                console.log('Processing song: ' + Math.floor(progress.percent/numberOfTimesSong) + '% done');
+                console.log('Processing song: ' + Math.floor(progress.percent) + '% done');
               })
               .on('error', (err: any) => {
                 console.log('An error occurred: ' + err.message);
               })
               .on('end', () => {
-                console.log('Song processing finished !');
+                console.log('Merge processing finished !');
               })
           })
       });
 
     function videoPreset(command: any): any {
-      numberOfTimesVideo = 1
       for(let i=0; i<numberOfTimesVideo; i++) {
         command.addInput(inputs.videos[0].path);
       }
@@ -58,12 +57,6 @@ export class VideosService {
       for(let i=0; i<numberOfTimesSong; i++) {
         command.addInput(inputs.songs[0].path);
       }
-      command.getAvailableCodecs(function(err, codecs) {
-        console.log('Available codecs:');
-        console.log(codecs);
-        
-        console.log(Object.keys(codecs).filter(cs=>codecs[cs].type == 'audio' && codecs[cs].canDecode == true && codecs[cs].canEncode == true));
-      });
       command.mergeToFile('/Users/juvanton/tmp.mp3', '/Users/juvanton/tmp/song');
     }
 
