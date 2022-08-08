@@ -1,0 +1,51 @@
+<mat-stepper linear="false" #stepper>
+  <mat-step [stepControl]="firstFormGroup" label="Select a video">
+    <form [formGroup]="firstFormGroup">
+      <button type="button" mat-raised-button (click)="videoInput.click()">Choose File</button>
+      <input hidden (change)="onFileSelected($event)" #videoInput type="file" formControlName="firstCtrl" accept="video/*" required>
+      <div>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="secondFormGroup" label="Select a song">
+    <form [formGroup]="secondFormGroup">
+      <button type="button" mat-raised-button (click)="audioInput.click()">Choose File</button>
+      <input hidden (change)="onFileSelected($event)" #audioInput type="file" formControlName="secondCtrl" accept="audio/*" required>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="thirdFormGroup" label="Fill the informations">
+    <form [formGroup]="thirdFormGroup">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Duration</mat-label>
+        <input matInput formControlName="duration" type="number">
+        <mat-hint align="end">in secondes</mat-hint>
+      </mat-form-field>
+      <mat-label>VOD</mat-label>
+      <mat-slide-toggle matInput (change)="toggleVOD($event)" [checked]="thirdFormGroup.value.vod"></mat-slide-toggle>
+      <mat-label>Short</mat-label>
+      <mat-slide-toggle matInput (change)="toggleShort($event)"></mat-slide-toggle>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Done</ng-template>
+    <p>You are now done.</p>
+    <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button (click)="stepper.reset()">Reset</button>
+      <button mat-button (click)="createVideo()">Create Video</button>
+    </div>
+  </mat-step>
+</mat-stepper>

@@ -18,3 +18,10 @@ export function createUtilsFolder(): void {
     if(!fs.existsSync(process.env.SAVE_FOLDER))
         fs.mkdirSync(process.env.SAVE_FOLDER);
 }
+
+/**
+ * Remove temp folder
+ */
+export function removeUtilsFolder(): void {
+    fs.rmSync(process.env.TEMP_FOLDER, {recursive: true});
+}
