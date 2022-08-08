@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import * as fluent_ffmpeg from 'fluent-ffmpeg';
 import { Inputs } from 'src/controllers/videos/videos.controller';
+import { createUtilsFolder } from 'src/utils/utils';
 
 @Injectable()
 export class VideosService {
 
   createVideo(inputs: Inputs): void {
-    let videoDuration: number = inputs.videos[0].duration;
-    let songDuration: number = inputs.songs[0].duration;
-    let numberOfTimesVideo: number = inputs.duration%videoDuration>0?Math.ceil(inputs.duration/videoDuration):inputs.duration/videoDuration;
+    const timestamp: number = new Date().getTime();
+
+    let videoDuration: number = inputs.video.duration;
+    let songDuration: number = inputs.song.duration;
+    let numberOfTimesVideo = 0;
     let numberOfTimesSong: number = inputs.duration%songDuration>0?Math.ceil(inputs.duration/songDuration):inputs.duration/songDuration;
-    console.log(videoDuration, songDuration, numberOfTimesVideo, numberOfTimesSong)
+
+    createUtilsFolder();
+
     new fluent_ffmpeg()
       .preset(videoPreset)
       .on('progress', (progress: any) => {
@@ -47,24 +52,28 @@ export class VideosService {
       });
 
     function videoPreset(command: any): any {
-      for(let i=0; i<numberOfTimesVideo; i++) {
-        command.addInput(inputs.videos[0].path);
+      let videoConcatedDuration = 0;
+      while(songDuration*numberOfTimesSong>videoConcatedDuration) {
+        command.addInput(inputs.video.path);
+        videoConcatedDuration += videoDuration;
+        numberOfTimesVideo++;
       }
-      command.mergeToFile('/Users/juvanton/tmp.mp4', '/Users/juvanton/tmp/video');
+      command.mergeToFile(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp4`, `${process.env.TEMP_FOLDER}`);
     }
 
     function songPreset(command: any): any {
       for(let i=0; i<numberOfTimesSong; i++) {
-        command.addInput(inputs.songs[0].path);
+        command.addInput(inputs.song.path);
       }
-      command.mergeToFile('/Users/juvanton/tmp.mp3', '/Users/juvanton/tmp/song');
+      command.mergeToFile(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp3`, `${process.env.TEMP_FOLDER}`);
     }
 
     function mergingPreset(command: any): any {
       command
-        .addInput('/Users/juvanton/tmp.mp4')
-        .addInput('/Users/juvanton/tmp.mp3')
-        .saveToFile('/Users/juvanton/video.mp4')
+        .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp4`)
+        .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp3`)
+        .outputOptions('-shortest')
+        .saveToFile(`${process.env.SAVE_FOLDER}${inputs.outputName}.mp4`)
     }
   }
 }

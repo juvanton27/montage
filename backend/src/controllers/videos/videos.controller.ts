@@ -7,9 +7,10 @@ export interface Media {
 }
 
 export interface Inputs {
-  videos: Media[];
-  songs: Media[];
-  duration: number
+  video: Media;
+  song: Media;
+  duration: number;
+  outputName: string;
 }
 
 @Controller('api/videos')

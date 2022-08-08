@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 
 /**
  * Returns duration in secondes
@@ -8,6 +9,12 @@ export function ffmpegDurationToSeconds(duration: string): number {
     return 3600*hours + 60*minutes + secondes;
 }
 
-export function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+/**
+ * Create temp and save folder if doesn't exist
+ */
+export function createUtilsFolder(): void {
+    if(!fs.existsSync(process.env.TEMP_FOLDER))
+        fs.mkdirSync(process.env.TEMP_FOLDER);
+    if(!fs.existsSync(process.env.SAVE_FOLDER))
+        fs.mkdirSync(process.env.SAVE_FOLDER);
 }
