@@ -41,6 +41,6 @@ export class VideosController {
 
   @Sse('sse') 
   sse(): Observable<MessageEvent> {
-    return this.videosService.progress$
+    return this.videosService.progress$;
   }
 }

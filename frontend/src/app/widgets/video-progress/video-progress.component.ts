@@ -29,5 +29,6 @@ export class VideoProgressComponent implements OnInit {
       this.progress = JSON.parse(data).percent;
     });
     eventSource.addEventListener('end', () => this.dialogRef.close({succeed: true}));
+    eventSource.addEventListener('error', ({data}: any) => this.dialogRef.close({succeed: false, message: data}));
   }
 }
