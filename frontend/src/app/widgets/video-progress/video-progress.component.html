@@ -1,1 +1,3 @@
-<p>video-progress works!</p>
+<p>{{ step }}</p>
+<mat-spinner *ngIf="type==='step'"></mat-spinner>
+<mat-progress-bar *ngIf="type==='progress'" mode="determinate" [value]="progress"></mat-progress-bar>

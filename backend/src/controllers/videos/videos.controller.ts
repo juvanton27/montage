@@ -21,9 +21,10 @@ export const PROGRESS_STEPS = [
   'Getting audio informations',
   'Starting video processing',
   'Video processing finished',
-  'Starting song processing',
-  'Audio processing',
-  'Merging'
+  'Starting audio processing',
+  'Audio processing finished',
+  'Merging ...',
+  'Merge processing finished'
 ]
 
 @Controller('api/videos')
