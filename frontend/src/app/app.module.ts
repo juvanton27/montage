@@ -7,16 +7,19 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { StepperComponent } from './widgets/stepper/stepper.component';
+import { VideoProgressComponent } from './widgets/video-progress/video-progress.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    StepperComponent
+    StepperComponent,
+    VideoProgressComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +33,8 @@ import { StepperComponent } from './widgets/stepper/stepper.component';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]

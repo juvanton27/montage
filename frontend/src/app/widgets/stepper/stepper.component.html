@@ -1,17 +1,21 @@
 <mat-stepper linear="false" #stepper>
   <mat-step [stepControl]="firstFormGroup" label="Select a video">
     <form [formGroup]="firstFormGroup">
-      <button type="button" mat-raised-button (click)="videoInput.click()">Choose File</button>
-      <input hidden (change)="onFileSelected($event)" #videoInput type="file" formControlName="firstCtrl" accept="video/*" required>
+      <mat-form-field appearance="outline">
+        <mat-label>Video absolute path</mat-label>
+        <input matInput formControlName="video">
+      </mat-form-field>
       <div>
         <button mat-button matStepperNext>Next</button>
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="secondFormGroup" label="Select a song">
+  <mat-step [stepControl]="secondFormGroup" label="Select an audio">
     <form [formGroup]="secondFormGroup">
-      <button type="button" mat-raised-button (click)="audioInput.click()">Choose File</button>
-      <input hidden (change)="onFileSelected($event)" #audioInput type="file" formControlName="secondCtrl" accept="audio/*" required>
+      <mat-form-field appearance="outline">
+        <mat-label>Audio absolute path</mat-label>
+        <input matInput formControlName="audio">
+      </mat-form-field>
       <div>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>
@@ -24,13 +28,13 @@
         <mat-label>Name</mat-label>
         <input matInput formControlName="name">
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-label>VOD</mat-label>
+      <mat-slide-toggle matInput (change)="toggleVOD($event)" [checked]="thirdFormGroup.value.vod"></mat-slide-toggle>
+      <mat-form-field *ngIf="thirdFormGroup.value.vod" appearance="outline">
         <mat-label>Duration</mat-label>
         <input matInput formControlName="duration" type="number">
         <mat-hint align="end">in secondes</mat-hint>
       </mat-form-field>
-      <mat-label>VOD</mat-label>
-      <mat-slide-toggle matInput (change)="toggleVOD($event)" [checked]="thirdFormGroup.value.vod"></mat-slide-toggle>
       <mat-label>Short</mat-label>
       <mat-slide-toggle matInput (change)="toggleShort($event)"></mat-slide-toggle>
       <div>

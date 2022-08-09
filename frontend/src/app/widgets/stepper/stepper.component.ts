@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { VideosService } from 'src/app/services/videos.service';
+import { VideoProgressComponent } from '../video-progress/video-progress.component';
 
 @Component({
   selector: 'app-stepper',
@@ -10,10 +12,10 @@ import { VideosService } from 'src/app/services/videos.service';
 export class StepperComponent {
 
   firstFormGroup = this._formBuilder.group({
-    firstCtrl: ['', Validators.required],
+    video: ['', Validators.required],
   });
   secondFormGroup = this._formBuilder.group({
-    secondCtrl: ['', Validators.required],
+    audio: ['', Validators.required],
   });
   thirdFormGroup = this._formBuilder.group({
     name: ['', Validators.required],
@@ -24,22 +26,9 @@ export class StepperComponent {
 
   constructor(
     private _formBuilder: FormBuilder,
-    private videosService: VideosService
+    private videosService: VideosService,
+    private dialog: MatDialog
   ) {}
-
-  onFileSelected(event: any) {
-    if(event.target.files[0].type === 'video/mp4')
-      this.firstFormGroup.value.firstCtrl = webkitURL.createObjectURL(new Blob([event.target.files[0]], {type: 'video/mp4'}));
-    if(event.target.files[0].type === 'audio/mpeg')
-      this.secondFormGroup.value.secondCtrl = webkitURL.createObjectURL(event.target.files[0]);
-    if (typeof (FileReader) !== 'undefined') {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        console.log(e.target.result);
-      };
-      reader.readAsArrayBuffer(event.target.files[0]);
-    }
-  }
 
   toggleVOD(e: any) {
     this.thirdFormGroup.value.vod = e.checked;
@@ -52,14 +41,22 @@ export class StepperComponent {
   createVideo(): void {
     const body = {
       video: {
-        path: this.firstFormGroup.value.firstCtrl
+        path: this.firstFormGroup.value.video
       },
       song: {
-        path: this.secondFormGroup.value.secondCtrl
+        path: this.secondFormGroup.value.audio
       },
       duration: this.thirdFormGroup.value.duration,
       outputName: this.thirdFormGroup.value.name
     }
-    this.videosService.createVideo(body).subscribe();
+    this.videosService.createVideo(body).subscribe(
+      () => {
+        this.dialog
+          .open(VideoProgressComponent)
+          .afterClosed().subscribe((result: any) => {
+            console.log('The dialog was closed');
+          });
+      }
+    );
   }
 }
