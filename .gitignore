@@ -5,3 +5,4 @@ assets/
 .vscode
 .angular
 save/
+tmp/
