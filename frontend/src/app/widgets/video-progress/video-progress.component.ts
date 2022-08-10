@@ -18,7 +18,7 @@ export class VideoProgressComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const eventSource = new EventSource('/api/videos/sse');
+    const eventSource = new EventSource('http://localhost:3000/api/videos/sse');
     eventSource.addEventListener('step', ({type, data}) => {
       this.type = type;
       this.step = data;
@@ -28,7 +28,13 @@ export class VideoProgressComponent implements OnInit {
       this.step = JSON.parse(data).label;
       this.progress = JSON.parse(data).percent;
     });
-    eventSource.addEventListener('end', () => this.dialogRef.close({succeed: true}));
-    eventSource.addEventListener('error', ({data}: any) => this.dialogRef.close({succeed: false, message: data}));
+    eventSource.addEventListener('end', () => {
+      eventSource.close();
+      this.dialogRef.close({succeed: true});
+    });
+    eventSource.addEventListener('error', ({data}: any) => {
+      eventSource.close();
+      this.dialogRef.close({succeed: false, message: data})
+    });
   }
 }

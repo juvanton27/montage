@@ -1,5 +1,6 @@
 import { Injectable, MessageEvent } from '@nestjs/common';
 import * as fluent_ffmpeg from 'fluent-ffmpeg';
+import * as path from 'path';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Inputs, PROGRESS_STEPS } from 'src/controllers/videos/videos.controller';
 import { createUtilsFolder, ffmpegDurationToSeconds, removeUtilsFolder } from 'src/utils/utils';
@@ -83,7 +84,7 @@ export class VideosService {
                             .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp3`)
                             .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp4`)
                             .outputOptions('-shortest')
-                            .saveToFile(`${process.env.SAVE_FOLDER}${inputs.outputName}.mp4`)
+                            .saveToFile(`${path.dirname(inputs.video.path)}/${inputs.outputName}.mp4`)
                             .on('start', () => {
                               this._progress.next({type: "step", data: PROGRESS_STEPS[8]});
                             })
@@ -91,7 +92,7 @@ export class VideosService {
                               this._progress.next({type: "error", data: ': ' + err.message});
                             })
                             .on('end', () => {
-                              this._progress.next({type: "step", data: PROGRESS_STEPS[9]});
+                              this._progress.next({type: "end", data: PROGRESS_STEPS[9]});
                               removeUtilsFolder();
                             });
                         });
@@ -149,7 +150,7 @@ export class VideosService {
                         .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp3`)
                         .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp4`)
                         .outputOptions('-shortest')
-                        .saveToFile(`${process.env.SAVE_FOLDER}${inputs.outputName}.mp4`)
+                        .saveToFile(`${path.dirname(inputs.video.path)}/${inputs.outputName}.mp4`)
                         .on('error', (err: any) => {
                           this._progress.next({type: "error", data: ': ' + err.message});
                         })

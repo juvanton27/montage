@@ -1,10 +1,8 @@
 <mat-stepper linear="false" #stepper>
   <mat-step [stepControl]="firstFormGroup" label="Select a video">
     <form [formGroup]="firstFormGroup">
-      <mat-form-field appearance="outline">
-        <mat-label>Video absolute path</mat-label>
-        <input matInput formControlName="video">
-      </mat-form-field>
+      <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
+      <input hidden (change)="handleFile($event)" #fileInput type="file" required>
       <div>
         <button mat-button matStepperNext>Next</button>
       </div>
@@ -12,10 +10,8 @@
   </mat-step>
   <mat-step [stepControl]="secondFormGroup" label="Select an audio">
     <form [formGroup]="secondFormGroup">
-      <mat-form-field appearance="outline">
-        <mat-label>Audio absolute path</mat-label>
-        <input matInput formControlName="audio">
-      </mat-form-field>
+      <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
+      <input hidden (change)="handleFile($event)" #fileInput type="file" required>
       <div>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>

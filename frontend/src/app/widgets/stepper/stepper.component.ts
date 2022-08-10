@@ -5,6 +5,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { VideosService } from 'src/app/services/videos.service';
 import { VideoProgressComponent } from '../video-progress/video-progress.component';
 
+// import { app } from 'electron';
+
 export interface DialogData {
   succeed: boolean;
   message: string;
@@ -62,6 +64,7 @@ export class StepperComponent {
           .open(VideoProgressComponent,
             {disableClose: true})
           .afterClosed().subscribe((result: DialogData) => {
+            // app.emit('finish');
             if(result.succeed) {
               this._snackBar.open("Operation succeeded");
             } else {
@@ -70,5 +73,14 @@ export class StepperComponent {
           });
       }
     );
+  }
+
+  handleFile(e: any) {
+    // app.emit('finish')
+    const ext = (e.target.files[0].path as string).split('.').pop();
+    if(ext === 'mp4')
+      this.firstFormGroup.value.video = e.target.files[0].path;
+    else
+      this.secondFormGroup.value.audio = e.target.files[0].path;
   }
 }

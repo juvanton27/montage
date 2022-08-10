@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class VideosService {
-  apiUrl: string = '/api/videos';
+  apiUrl: string = 'http://localhost:3000/api/videos';
 
   constructor(private http: HttpClient) { }
 
