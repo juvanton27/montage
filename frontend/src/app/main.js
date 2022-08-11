@@ -5,7 +5,7 @@ let appWindow
 function initWindow() {
   appWindow = new BrowserWindow({
     width: 1000,
-    height: 800,
+    height: 500,
     webPreferences: {
       nodeIntegration: true
     },

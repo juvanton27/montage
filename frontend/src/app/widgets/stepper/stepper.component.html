@@ -1,43 +1,73 @@
 <mat-stepper linear="false" #stepper>
   <mat-step [stepControl]="firstFormGroup" label="Select a video">
-    <form [formGroup]="firstFormGroup">
-      <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
-      <input hidden (change)="handleFile($event)" #fileInput type="file" required>
-      <div>
-        <button mat-button matStepperNext>Next</button>
+    <mat-card>
+      <div mat-card-content *ngIf="!firstFormGroup.value.video">No video selected</div>
+      <div mat-card-content>
+        <p>{{ videoName }}</p>
+        <video width="300" height="150" *ngIf="firstFormGroup.value.video">
+          <source [src]="firstFormGroup.value.video+'#t=0.1'" type="video/mp4" />
+       </video>
       </div>
-    </form>
+      <div mat-card-actions align="end">
+        <button type="button" mat-raised-button (click)="videoInput.click()">Choose File</button>
+        <button mat-button matStepperNext>Next</button>
+        <form [formGroup]="firstFormGroup">
+          <input hidden (change)="handleFile($event)" #videoInput type="file" accept="video/*" required>
+        </form>
+      </div>
+    </mat-card>
   </mat-step>
   <mat-step [stepControl]="secondFormGroup" label="Select an audio">
-    <form [formGroup]="secondFormGroup">
-      <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
-      <input hidden (change)="handleFile($event)" #fileInput type="file" required>
-      <div>
+    <mat-card>
+      <div mat-card-content *ngIf="!secondFormGroup.value.audio">No audio selected</div>
+      <div mat-card-content *ngIf="secondFormGroup.value.audio">
+        <p>{{ audioName }}</p>
+        <img src="./assets/audio.png" alt="audio">
+      </div>
+      <div mat-card-actions align="end">
+        <button type="button" mat-raised-button (click)="audioInput.click()">Choose File</button>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>
+        <form [formGroup]="secondFormGroup">
+          <input hidden (change)="handleFile($event)" #audioInput type="file" accept=".mp3" required>
+        </form>
       </div>
-    </form>
+    </mat-card>
   </mat-step>
   <mat-step [stepControl]="thirdFormGroup" label="Fill the informations">
-    <form [formGroup]="thirdFormGroup">
-      <mat-form-field appearance="outline">
-        <mat-label>Name</mat-label>
-        <input matInput formControlName="name">
-      </mat-form-field>
-      <mat-label>VOD</mat-label>
-      <mat-slide-toggle matInput (change)="toggleVOD($event)" [checked]="thirdFormGroup.value.vod"></mat-slide-toggle>
-      <mat-form-field *ngIf="thirdFormGroup.value.vod" appearance="outline">
-        <mat-label>Duration</mat-label>
-        <input matInput formControlName="duration" type="number">
-        <mat-hint align="end">in secondes</mat-hint>
-      </mat-form-field>
-      <mat-label>Short</mat-label>
-      <mat-slide-toggle matInput (change)="toggleShort($event)"></mat-slide-toggle>
-      <div>
+    <mat-card>
+      <mat-grid-list cols="2" rowHeight="100px">
+      <form mat-card-content [formGroup]="thirdFormGroup">
+          <mat-grid-tile>
+            <mat-form-field appearance="outline">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name">
+            </mat-form-field>
+          </mat-grid-tile>
+          <mat-grid-tile>
+            <mat-button-toggle-group #type="matButtonToggleGroup">
+              <mat-button-toggle value="vod">
+                  VOD
+              </mat-button-toggle>
+              <mat-button-toggle value="short">
+                  Short
+              </mat-button-toggle>
+          </mat-button-toggle-group>
+          </mat-grid-tile>
+          <mat-grid-tile *ngIf="type.value==='vod'">
+            <mat-form-field appearance="outline">
+              <mat-label>Duration</mat-label>
+              <input matInput formControlName="duration" type="number">
+              <mat-hint align="end">in secondes</mat-hint>
+            </mat-form-field>
+          </mat-grid-tile>
+        </form>
+        </mat-grid-list>
+      <div mat-card-actions align="end">
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>
       </div>
-    </form>
+    </mat-card>
   </mat-step>
   <mat-step>
     <ng-template matStepLabel>Done</ng-template>

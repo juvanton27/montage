@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { VideosService } from 'src/app/services/videos.service';
 
 @Component({
@@ -8,6 +9,8 @@ import { VideosService } from 'src/app/services/videos.service';
   styleUrls: ['./stepper.component.scss']
 })
 export class StepperComponent {
+  videoName: string | undefined;
+  audioName: string | undefined;
 
   firstFormGroup = this._formBuilder.group({
     video: ['', Validators.required],
@@ -18,22 +21,13 @@ export class StepperComponent {
   thirdFormGroup = this._formBuilder.group({
     name: ['', Validators.required],
     duration: ['', Validators.required],
-    vod: [true, Validators.required],
-    short: [false, Validators.required]
   });
+  @ViewChild('type') type: any;
 
   constructor(
     private _formBuilder: FormBuilder,
     private videosService: VideosService,
-  ) {}
-
-  toggleVOD(e: any) {
-    this.thirdFormGroup.value.vod = e.checked;
-  }
-
-  toggleShort(e: any) {
-    this.thirdFormGroup.value.short = e.checked;
-  }
+  ) { }
 
   createVideo(): void {
     const body = {
@@ -43,18 +37,20 @@ export class StepperComponent {
       song: {
         path: this.secondFormGroup.value.audio
       },
-      duration: this.thirdFormGroup.value.duration,
+      duration: this.type.value==='short'?1:this.thirdFormGroup.value.duration,
       outputName: this.thirdFormGroup.value.name
     }
     this.videosService.createVideo(body).subscribe();
   }
 
   handleFile(e: any) {
-    // app.emit('finish')
     const ext = (e.target.files[0].path as string).split('.').pop();
-    if(ext === 'mp4')
+    if(ext === 'mp4') {
       this.firstFormGroup.value.video = e.target.files[0].path;
-    else
+      this.videoName = this.firstFormGroup.value.video?.split('/').pop();
+    } else {
       this.secondFormGroup.value.audio = e.target.files[0].path;
+      this.audioName = this.secondFormGroup.value.audio?.split('/').pop();
+    }
   }
 }
