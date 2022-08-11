@@ -1,3 +1,9 @@
-<p>{{ step }}</p>
-<mat-spinner *ngIf="type==='step'"></mat-spinner>
-<mat-progress-bar *ngIf="type==='progress'" mode="determinate" [value]="progress"></mat-progress-bar>
+<h1 mat-dialog-title>{{ step }}</h1>
+<div mat-dialog-content>
+    <mat-spinner *ngIf="type==='step'"></mat-spinner>
+    <mat-progress-bar *ngIf="type==='progress'" mode="determinate" [value]="progress"></mat-progress-bar>
+</div>
+<div mat-dialog-actions align="end">
+    <button mat-button [mat-dialog-close]="{succeed: false, message: 'cancel'}">Cancel</button>
+</div>
+

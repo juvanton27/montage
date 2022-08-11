@@ -13,4 +13,8 @@ export class VideosService {
   createVideo(body: any): Observable<void> {
     return this.http.post<void>(this.apiUrl, body);
   }
+
+  cancelVideo(): Observable<void> {
+    return this.http.get<void>(`${this.apiUrl}/cancel`);
+  }
 }

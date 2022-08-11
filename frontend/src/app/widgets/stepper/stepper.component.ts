@@ -1,16 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { VideosService } from 'src/app/services/videos.service';
-import { VideoProgressComponent } from '../video-progress/video-progress.component';
-
-// import { app } from 'electron';
-
-export interface DialogData {
-  succeed: boolean;
-  message: string;
-}
 
 @Component({
   selector: 'app-stepper',
@@ -35,8 +25,6 @@ export class StepperComponent {
   constructor(
     private _formBuilder: FormBuilder,
     private videosService: VideosService,
-    private dialog: MatDialog,
-    private _snackBar: MatSnackBar
   ) {}
 
   toggleVOD(e: any) {
@@ -58,21 +46,7 @@ export class StepperComponent {
       duration: this.thirdFormGroup.value.duration,
       outputName: this.thirdFormGroup.value.name
     }
-    this.videosService.createVideo(body).subscribe(
-      () => {
-        this.dialog
-          .open(VideoProgressComponent,
-            {disableClose: true})
-          .afterClosed().subscribe((result: DialogData) => {
-            // app.emit('finish');
-            if(result.succeed) {
-              this._snackBar.open("Operation succeeded");
-            } else {
-              this._snackBar.open(result.message);
-            }
-          });
-      }
-    );
+    this.videosService.createVideo(body).subscribe();
   }
 
   handleFile(e: any) {

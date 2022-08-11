@@ -10,6 +10,7 @@ export class VideosService {
 
   private _progress: BehaviorSubject<MessageEvent> = new BehaviorSubject({data: ""});
   progress$: Observable<MessageEvent> = this._progress.asObservable();
+  main: any;
 
   createVideo(inputs: Inputs): void {
     const timestamp: number = new Date().getTime();
@@ -25,25 +26,25 @@ export class VideosService {
 
     createUtilsFolder();
 
-    fluent_ffmpeg(videoInput)
+    this.main = fluent_ffmpeg(videoInput)
       .addOption('-f', 'null')
       .on('codecData', (data: any) => {
         videoDuration = ffmpegDurationToSeconds(data.duration);
         this._progress.next({type: "step", data: PROGRESS_STEPS[0]});
         if(!data.video_details.includes('1920x1080')) {
           videoInput = inputs.video.path.replace(".mp4", "_new.mp4");
-          fluent_ffmpeg(inputs.video.path)
+          this.main = fluent_ffmpeg(inputs.video.path)
             .size('1920x1080')
             .on('start', () => {
               this._progress.next({type: "step", data: PROGRESS_STEPS[1]});
             })
             .on('progress', (progress: any) => {
-              this._progress.next({type: "progress", data: {label: 'Fixing quality ', percent: Math.floor(progress.percent)}});
+              this._progress.next({type: "progress", data: {label: 'Fixing quality', percent: Math.floor(progress.percent)}});
             })
             .output(videoInput)
             .on('end', () => {
               this._progress.next({type: "step", data: PROGRESS_STEPS[2]});
-              fluent_ffmpeg(audioInput)
+              this.main = fluent_ffmpeg(audioInput)
                 .addOption('-f', 'null')
                 .on('codecData', (data: any) => {
                   songDuration = ffmpegDurationToSeconds(data.duration);
@@ -52,47 +53,45 @@ export class VideosService {
                 })
                 .output('/dev/null')
                 .on('end', () => {
-                  fluent_ffmpeg()
+                  this.main = fluent_ffmpeg()
                     .preset(videoPreset)
                     .mergeToFile(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp4`, process.env.TEMP_FOLDER)
                     .on('start', () => {
                       this._progress.next({type: "step", data: PROGRESS_STEPS[4]});
                     })
                     .on('progress', (progress: any) => {
-                      this._progress.next({type: "progress", data: {label: 'Processing video: ', percent: Math.floor(progress.percent / numberOfTimesVideo)}});
+                      this._progress.next({type: "progress", data: {label: 'Processing video', percent: Math.floor(progress.percent / numberOfTimesVideo)}});
                     })
                     .on('error', (err: any) => {
-                      this._progress.next({type: "error", data: ': ' + err.message});
+                      this._progress.next({type: "error", data: err.message});
                     })
                     .on('end', () => {
                       this._progress.next({type: "step", data: PROGRESS_STEPS[5]});
-                      fluent_ffmpeg()
+                      this.main = fluent_ffmpeg()
                         .preset(songPreset)
                         .mergeToFile(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp3`, process.env.TEMP_FOLDER)
                         .on('start', () => {
                           this._progress.next({type: "step", data: PROGRESS_STEPS[6]});
                         })
                         .on('progress', (progress: any) => {
-                          this._progress.next({type: "progress", data: {label: 'Processing song: ', percent: Math.floor(progress.percent / numberOfTimesSong)}});
+                          this._progress.next({type: "progress", data: {label: 'Processing song', percent: Math.floor(progress.percent / numberOfTimesSong)}});
                         })
                         .on('error', (err: any) => {
-                          this._progress.next({type: "error", data: ': ' + err.message});
+                          this._progress.next({type: "error", data: err.message});
                         })
                         .on('end', () => {
                           this._progress.next({type: "step", data: PROGRESS_STEPS[7]});
-                          fluent_ffmpeg()
+                          this._progress.next({type: "step", data: PROGRESS_STEPS[8]});
+                          this.main = fluent_ffmpeg()
                             .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp3`)
                             .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp4`)
                             .outputOptions('-shortest')
                             .saveToFile(`${path.dirname(inputs.video.path)}/${inputs.outputName}.mp4`)
-                            .on('start', () => {
-                              this._progress.next({type: "step", data: PROGRESS_STEPS[8]});
-                            })
                             .on('error', (err: any) => {
-                              this._progress.next({type: "error", data: ': ' + err.message});
+                              this._progress.next({type: "error", data: err.message});
                             })
                             .on('end', () => {
-                              this._progress.next({type: "end", data: PROGRESS_STEPS[9]});
+                              this._progress.next({type: "end", data: {label: PROGRESS_STEPS[9], savePath: `${path.dirname(inputs.video.path)}/${inputs.outputName}.mp4`}});
                               removeUtilsFolder();
                             });
                         });
@@ -108,7 +107,7 @@ export class VideosService {
       .output('/dev/null')
       .on('end', () => {
         if(goodQuality)
-          fluent_ffmpeg(audioInput)
+          this.main = fluent_ffmpeg(audioInput)
             .addOption('-f', 'null')
             .on('codecData', (data: any) => {
               songDuration = ffmpegDurationToSeconds(data.duration);
@@ -117,45 +116,45 @@ export class VideosService {
             })
             .output('/dev/null')
             .on('end', () => {
-              fluent_ffmpeg()
+              this.main = fluent_ffmpeg()
                 .preset(videoPreset)
                 .mergeToFile(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp4`, process.env.TEMP_FOLDER)
                 .on('start', () => {
                   this._progress.next({type: "step", data: PROGRESS_STEPS[4]});
                 })
                 .on('progress', (progress: any) => {
-                  this._progress.next({type: "progress", data: {label: 'Processing video: ', percent: Math.floor(progress.percent / numberOfTimesVideo)}});
+                  this._progress.next({type: "progress", data: {label: 'Processing video', percent: Math.floor(progress.percent / numberOfTimesVideo)}});
                 })
                 .on('error', (err: any) => {
-                  this._progress.next({type: "error", data: ': ' + err.message});
+                  this._progress.next({type: "error", data: err.message});
                 })
                 .on('end', () => {
                   this._progress.next({type: "step", data: PROGRESS_STEPS[5]});
-                  fluent_ffmpeg()
+                  this.main = fluent_ffmpeg()
                     .preset(songPreset)
                     .mergeToFile(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp3`, process.env.TEMP_FOLDER)
                     .on('start', () => {
                       this._progress.next({type: "step", data: PROGRESS_STEPS[6]});
                     })
                     .on('progress', (progress: any) => {
-                      this._progress.next({type: "progress", data: {label: 'Processing song: ', percent: Math.floor(progress.percent / numberOfTimesSong)}});
+                      this._progress.next({type: "progress", data: {label: 'Processing song', percent: Math.floor(progress.percent / numberOfTimesSong)}});
                     })
                     .on('error', (err: any) => {
-                      this._progress.next({type: "error", data: ': ' + err.message});
+                      this._progress.next({type: "error", data: err.message});
                     })
                     .on('end', () => {
                       this._progress.next({type: "step", data: PROGRESS_STEPS[7]});
                       this._progress.next({type: "step", data: PROGRESS_STEPS[8]});
-                      fluent_ffmpeg()
+                      this.main = fluent_ffmpeg()
                         .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp3`)
                         .addInput(`${process.env.TEMP_FOLDER}tmp_${timestamp}.mp4`)
                         .outputOptions('-shortest')
                         .saveToFile(`${path.dirname(inputs.video.path)}/${inputs.outputName}.mp4`)
                         .on('error', (err: any) => {
-                          this._progress.next({type: "error", data: ': ' + err.message});
+                          this._progress.next({type: "error", data: err.message});
                         })
                         .on('end', () => {
-                          this._progress.next({type: "end", data: PROGRESS_STEPS[9]});
+                          this._progress.next({type: "end", data: {label: PROGRESS_STEPS[9], savePath: `${path.dirname(inputs.video.path)}/${inputs.outputName}.mp4`}});
                           removeUtilsFolder();
                         });
                     });
@@ -179,5 +178,10 @@ export class VideosService {
         command.addInput(audioInput);
       }
     }
+  }
+
+  cancelVideo(): void {
+    this.main.kill();
+    removeUtilsFolder();
   }
 }

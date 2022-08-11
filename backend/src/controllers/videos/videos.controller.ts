@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Sse, MessageEvent } from '@nestjs/common';
+import { Body, Controller, Post, Sse, MessageEvent, Get } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { interval, map, Observable, of } from 'rxjs';
 import { VideosService } from 'src/services/videos/videos.service';
@@ -39,8 +39,15 @@ export class VideosController {
     return this.videosService.createVideo(inputs);
   }
 
+  @Get('cancel')
+  cancelVideo(): void {
+    return this.videosService.cancelVideo();
+  }
+
   @Sse('sse') 
   sse(): Observable<MessageEvent> {
-    return this.videosService.progress$;
+    return this.videosService.progress$.pipe(
+      map((p) => {console.log(p); return p})
+    );
   }
 }

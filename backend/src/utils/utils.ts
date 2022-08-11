@@ -15,8 +15,6 @@ export function ffmpegDurationToSeconds(duration: string): number {
 export function createUtilsFolder(): void {
     if(!fs.existsSync(process.env.TEMP_FOLDER))
         fs.mkdirSync(process.env.TEMP_FOLDER);
-    if(!fs.existsSync(process.env.SAVE_FOLDER))
-        fs.mkdirSync(process.env.SAVE_FOLDER);
 }
 
 /**
