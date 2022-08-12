@@ -14,4 +14,8 @@ export class FilesService {
   getFiles(type?: string): Observable<FileNode> {
     return from(this.http.get<FileNode>(`${this.apiUrl}?type=${type?type:''}`));
   }
+
+  getAbsolutePath(relativePath: string): Observable<{absolutePath: string}> {
+    return from(this.http.post<{absolutePath: string}>(`${this.apiUrl}/path`, {relativePath}));
+  }
 }

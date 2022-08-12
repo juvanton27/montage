@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { FileNode, FilesService } from 'src/services/files/files.service';
 
@@ -10,5 +10,10 @@ export class FilesController {
   @Get()
   getFiles(@Query('type') type?: string): Observable<FileNode> {
     return this.filesService.getFiles(type);
+  }
+
+  @Post('/path')
+  getAbsolutePath(@Body('relativePath') relativePath: string): Observable<{absolutePath: string}> {
+    return this.filesService.getAbsolutePath(relativePath);
   }
 }

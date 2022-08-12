@@ -2,7 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import {NestedTreeControl, TreeControl} from '@angular/cdk/tree';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import { FilesService } from 'src/app/services/files.service';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { map } from 'rxjs';
 
 export interface FileNode {
   name: string;
@@ -20,6 +21,7 @@ export class FilesExplorerComponent implements OnInit {
 
   constructor(
     private filesService: FilesService,
+    public dialogRef: MatDialogRef<FilesExplorerComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {type: string},
   ) { }
 
@@ -32,7 +34,9 @@ export class FilesExplorerComponent implements OnInit {
   hasChild = (_: number, node: FileNode) => !!node.children && node.children.length > 0;
 
   fileClick(tree: any) {
-    console.log(Array.from(tree.expansionModel._selection).reduce((p: any, c: any) => `${p}${c.name}/`, ""));
-    
+    const relativePath = Array.from(tree.expansionModel._selection).reduce<string>((p: any, c: any) => `${p}/${c.name}`, "");    
+    this.filesService.getAbsolutePath(relativePath).subscribe(
+      ({absolutePath}) => this.dialogRef.close({absolutePath})
+    )
   }
 }

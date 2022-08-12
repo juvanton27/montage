@@ -11,18 +11,14 @@ import { FilesExplorerComponent } from '../files-explorer/files-explorer.compone
   styleUrls: ['./stepper.component.scss']
 })
 export class StepperComponent {
+  videoPath: any;
+  audioPath: any;
   videoName: string | undefined;
   audioName: string | undefined;
 
-  firstFormGroup = this._formBuilder.group({
-    video: ['', Validators.required],
-  });
-  secondFormGroup = this._formBuilder.group({
-    audio: ['', Validators.required],
-  });
-  thirdFormGroup = this._formBuilder.group({
+  formGroup = this._formBuilder.group({
     name: ['', Validators.required],
-    duration: ['', Validators.required],
+    duration: [''],
   });
   @ViewChild('type') type: any;
 
@@ -32,39 +28,37 @@ export class StepperComponent {
     public dialog: MatDialog
   ) { }
 
+  formValid(): boolean {
+    return this.videoPath && this.audioPath && this.formGroup.valid
+  }
+
   createVideo(): void {
     const body = {
       video: {
-        path: this.firstFormGroup.value.video
+        path: this.videoPath
       },
       song: {
-        path: this.secondFormGroup.value.audio
+        path: this.audioPath
       },
-      duration: this.type.value==='short'?1:this.thirdFormGroup.value.duration,
-      outputName: this.thirdFormGroup.value.name
+      duration: this.type.value==='short'?1:this.formGroup.value.duration,
+      outputName: this.formGroup.value.name
     }
+    console.log(body);
+    
     this.videosService.createVideo(body).subscribe();
   }
 
-  handleFile(e: any) {
-    const ext = (e.target.files[0].path as string).split('.').pop();
-    if(ext === 'mp4') {
-      this.firstFormGroup.value.video = e.target.files[0].path;
-      this.videoName = this.firstFormGroup.value.video?.split('/').pop();
-    } else {
-      this.secondFormGroup.value.audio = e.target.files[0].path;
-      this.audioName = this.secondFormGroup.value.audio?.split('/').pop();
-    }
-  }
-
-  videoInput(type: string): void {
+  input(format: string): void {
     this.dialog.open(FilesExplorerComponent, {
       width: '50%',
       height: '80%',
       disableClose: true,
-      data: {type}
+      data: {type: format}
     }).afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
+        if(format === 'mp4')
+          this.videoPath = result.absolutePath;
+        if(format === 'mp3')
+          this.audioPath = result.absolutePath;
       });
   }
 }

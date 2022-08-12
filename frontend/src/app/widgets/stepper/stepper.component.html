@@ -1,37 +1,37 @@
 <mat-stepper linear="false" #stepper>
-  <mat-step [stepControl]="firstFormGroup" label="Select a video">
+  <mat-step [stepControl]="formGroup" label="Select a video">
     <mat-card>
-      <div mat-card-content *ngIf="!firstFormGroup.value.video">No video selected</div>
+      <div mat-card-content *ngIf="!videoPath">No video selected</div>
       <div mat-card-content>
         <p>{{ videoName }}</p>
-        <video width="300" height="150" *ngIf="firstFormGroup.value.video">
-          <source [src]="firstFormGroup.value.video+'#t=0.1'" type="video/mp4" />
+        <video width="300" height="150" *ngIf="videoPath">
+          <source [src]="videoPath+'#t=0.1'" type="video/mp4" />
        </video>
       </div>
       <div mat-card-actions align="end">
-        <button type="button" mat-raised-button (click)="videoInput('mp4')">Choose File</button>
+        <button type="button" mat-raised-button (click)="input('mp4')">Choose File</button>
         <button mat-button matStepperNext>Next</button>
       </div>
     </mat-card>
   </mat-step>
-  <mat-step [stepControl]="secondFormGroup" label="Select an audio">
+  <mat-step [stepControl]="formGroup" label="Select an audio">
     <mat-card>
-      <div mat-card-content *ngIf="!secondFormGroup.value.audio">No audio selected</div>
-      <div mat-card-content *ngIf="secondFormGroup.value.audio">
+      <div mat-card-content *ngIf="!audioPath">No audio selected</div>
+      <div mat-card-content *ngIf="audioPath">
         <p>{{ audioName }}</p>
         <img src="./assets/audio.png" alt="audio">
       </div>
       <div mat-card-actions align="end">
-        <button type="button" mat-raised-button (click)="videoInput('mp3')">Choose File</button>
+        <button type="button" mat-raised-button (click)="input('mp3')">Choose File</button>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>
       </div>
     </mat-card>
   </mat-step>
-  <mat-step [stepControl]="thirdFormGroup" label="Fill the informations">
+  <mat-step [stepControl]="formGroup" label="Fill the informations">
     <mat-card>
       <mat-grid-list cols="2" rowHeight="100px">
-      <form mat-card-content [formGroup]="thirdFormGroup">
+      <form mat-card-content [formGroup]="formGroup">
           <mat-grid-tile>
             <mat-form-field appearance="outline">
               <mat-label>Name</mat-label>
@@ -69,7 +69,7 @@
       <div mat-card-actions align="end">
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button (click)="stepper.reset()">Reset</button>
-        <button mat-button (click)="createVideo()">Create Video</button>
+        <button mat-button (click)="createVideo()" [disabled]="!formValid()">Create Video</button>
       </div>
     </mat-card>
   </mat-step>

@@ -33,4 +33,11 @@ export class FilesService {
       }).filter(f=>f!==undefined);
     return tree;
   }
+
+  getAbsolutePath(relativePath: string): Observable<{absolutePath: string}> {
+    const absolute = process.env.FOLDER.split("/").filter(p=>p!=='');
+    const relative = relativePath.split("/").filter(p=>p!=='');
+    relative.shift();
+    return of({absolutePath: absolute.concat(relative).reduce((p,c)=>`${p}/${c}`, '')});
+  }
 }
