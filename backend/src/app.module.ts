@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { VideosController } from './controllers/videos/videos.controller';
 import { VideosService } from './services/videos/videos.service';
+import { FilesController } from './controllers/files/files.controller';
+import { FilesService } from './services/files/files.service';
 
 @Module({
   imports: [
@@ -15,11 +17,11 @@ import { VideosService } from './services/videos/videos.service';
   ],
   controllers: [
     AppController, 
-    VideosController
+    VideosController, FilesController
   ],
   providers: [
     AppService, 
-    VideosService
+    VideosService, FilesService
   ],
 })
 export class AppModule {}
