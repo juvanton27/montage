@@ -19,12 +19,18 @@ import { StepperComponent } from './widgets/stepper/stepper.component';
 import { VideoProgressComponent } from './widgets/video-progress/video-progress.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { FilesExplorerComponent } from './widgets/files-explorer/files-explorer.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
+import { MatTreeModule } from '@angular/material/tree';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
     AppComponent,
     StepperComponent,
-    VideoProgressComponent
+    VideoProgressComponent,
+    FilesExplorerComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +50,9 @@ import { MatGridListModule } from '@angular/material/grid-list';
     MatProgressBarModule,
     MatSnackBarModule,
     MatCardModule,
-    MatGridListModule
+    MatGridListModule,
+    MatTreeModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent]

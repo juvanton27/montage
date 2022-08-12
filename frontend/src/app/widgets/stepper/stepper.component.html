@@ -9,11 +9,8 @@
        </video>
       </div>
       <div mat-card-actions align="end">
-        <button type="button" mat-raised-button (click)="videoInput.click()">Choose File</button>
+        <button type="button" mat-raised-button (click)="videoInput('mp4')">Choose File</button>
         <button mat-button matStepperNext>Next</button>
-        <form [formGroup]="firstFormGroup">
-          <input hidden (change)="handleFile($event)" #videoInput type="file" accept="video/*" required>
-        </form>
       </div>
     </mat-card>
   </mat-step>
@@ -25,12 +22,9 @@
         <img src="./assets/audio.png" alt="audio">
       </div>
       <div mat-card-actions align="end">
-        <button type="button" mat-raised-button (click)="audioInput.click()">Choose File</button>
+        <button type="button" mat-raised-button (click)="videoInput('mp3')">Choose File</button>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>
-        <form [formGroup]="secondFormGroup">
-          <input hidden (change)="handleFile($event)" #audioInput type="file" accept=".mp3" required>
-        </form>
       </div>
     </mat-card>
   </mat-step>
@@ -69,13 +63,14 @@
       </div>
     </mat-card>
   </mat-step>
-  <mat-step>
-    <ng-template matStepLabel>Done</ng-template>
-    <p>You are now done.</p>
-    <div>
-      <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="stepper.reset()">Reset</button>
-      <button mat-button (click)="createVideo()">Create Video</button>
-    </div>
+  <mat-step label="Done">
+    <mat-card>
+      <p mat-card-content>You are now done.</p>
+      <div mat-card-actions align="end">
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button (click)="stepper.reset()">Reset</button>
+        <button mat-button (click)="createVideo()">Create Video</button>
+      </div>
+    </mat-card>
   </mat-step>
 </mat-stepper>

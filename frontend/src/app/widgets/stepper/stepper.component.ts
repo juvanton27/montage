@@ -1,7 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatDialog } from '@angular/material/dialog';
 import { VideosService } from 'src/app/services/videos.service';
+import { FilesExplorerComponent } from '../files-explorer/files-explorer.component';
 
 @Component({
   selector: 'app-stepper',
@@ -27,6 +29,7 @@ export class StepperComponent {
   constructor(
     private _formBuilder: FormBuilder,
     private videosService: VideosService,
+    public dialog: MatDialog
   ) { }
 
   createVideo(): void {
@@ -52,5 +55,16 @@ export class StepperComponent {
       this.secondFormGroup.value.audio = e.target.files[0].path;
       this.audioName = this.secondFormGroup.value.audio?.split('/').pop();
     }
+  }
+
+  videoInput(type: string): void {
+    this.dialog.open(FilesExplorerComponent, {
+      width: '50%',
+      height: '80%',
+      disableClose: true,
+      data: {type}
+    }).afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+      });
   }
 }
