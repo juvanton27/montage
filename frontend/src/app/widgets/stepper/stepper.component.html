@@ -3,7 +3,7 @@
     <mat-card>
       <div mat-card-content *ngIf="!videoPath">No video selected</div>
       <div mat-card-content>
-        <p>{{ videoName }}</p>
+        <p>{{ videoPath?.split('/')[videoPath.split('/').length-1] }}</p>
         <video width="300" height="150" *ngIf="videoPath">
           <source [src]="videoPath+'#t=0.1'" type="video/mp4" />
        </video>
@@ -18,7 +18,7 @@
     <mat-card>
       <div mat-card-content *ngIf="!audioPath">No audio selected</div>
       <div mat-card-content *ngIf="audioPath">
-        <p>{{ audioName }}</p>
+        <p>{{ audioPath?.split('/')[audioPath.split('/').length-1] }}</p>
         <img src="./assets/audio.png" alt="audio">
       </div>
       <div mat-card-actions align="end">

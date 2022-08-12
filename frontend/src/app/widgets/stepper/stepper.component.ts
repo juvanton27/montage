@@ -1,6 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { VideosService } from 'src/app/services/videos.service';
 import { FilesExplorerComponent } from '../files-explorer/files-explorer.component';
@@ -13,8 +12,6 @@ import { FilesExplorerComponent } from '../files-explorer/files-explorer.compone
 export class StepperComponent {
   videoPath: any;
   audioPath: any;
-  videoName: string | undefined;
-  audioName: string | undefined;
 
   formGroup = this._formBuilder.group({
     name: ['', Validators.required],

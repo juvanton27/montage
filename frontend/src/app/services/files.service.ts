@@ -7,7 +7,7 @@ import { FileNode } from '../widgets/files-explorer/files-explorer.component';
   providedIn: 'root'
 })
 export class FilesService {
-  apiUrl: string = 'api/files'//'http://localhost:3000/api/files';
+  apiUrl: string = 'http://localhost:3000/api/files';
 
   constructor(private http: HttpClient) { }
 
