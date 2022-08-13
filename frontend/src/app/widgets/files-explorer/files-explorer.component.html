@@ -1,4 +1,4 @@
-<h1 mat-dialog-content>Select {{ type==='mp4'?'a video':'an audio'</h1>
+<h1 mat-dialog-content>Select {{ data.type==='mp4'?'a video':'an audio' }}</h1>
 <mat-dialog-content>
   <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle (click)="fileClick(treeControl)">
