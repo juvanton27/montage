@@ -12,7 +12,7 @@ export interface FileNode {
   providedIn: 'root'
 })
 export class FilesService {
-  private apiUrl = 'http://localhost:3000/api/files';
+  private apiUrl = 'http://192.168.1.7:3000/api/files';
 
   constructor(private http: HTTP) { }
 

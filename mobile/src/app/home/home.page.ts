@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { ToastController } from '@ionic/angular';
+import { BehaviorSubject, from, Observable } from 'rxjs';
 import { FileNode, FilesService } from '../services/files.service';
 import { VideosService } from '../services/videos.service';
 
@@ -18,6 +19,7 @@ export class HomePage implements OnInit {
   @ViewChild('modal') modal: any;
   @ViewChild('modalProgress') modalProgress: any;
   presentingElement = null;
+  progressOpened: boolean = false;
 
   // Form
   videoPath: string = "";
@@ -30,51 +32,53 @@ export class HomePage implements OnInit {
   swiper: any = undefined;
 
   // SSE
-  eventSource = new EventSource('http://localhost:3000/api/videos/sse');
-
+  eventSource = new EventSource('api/videos/sse');
   private _type: BehaviorSubject<string> = new BehaviorSubject("");
   type$: Observable<string> = this._type.asObservable();
-
   private _step: BehaviorSubject<string> = new BehaviorSubject("");
   step$: Observable<string> = this._step.asObservable();
-
   private _progress: BehaviorSubject<number> = new BehaviorSubject(0);
   progress$: Observable<number> = this._progress.asObservable();
-
   type: string = "";
   step: string = "";
   progress: number = 0;
 
   constructor(
     private filesService: FilesService,
-    private videosService: VideosService
+    private videosService: VideosService,
+    public toastController: ToastController
   ) { }
 
   ngOnInit() {
     this.eventSource.addEventListener('step', ({type, data}) => {
-      console.log("oui");
-      // if(this.dialogRef?.getState() !== MatDialogState.OPEN) {
-      //   this.openDialog();
-      // }
+      if(!this.progressOpened)
+        from(this.modalProgress.present()).subscribe(() => this.progressOpened = true);
       this._type.next(type);
       this._step.next(data);
     });
     this.eventSource.addEventListener('progress', ({type, data}) => {
-      console.log("oui");
-      // if(this.dialogRef?.getState() !== MatDialogState.OPEN) {
-      //   this.openDialog();
-      // }
+      from(this.modalProgress?.getCurrentBreakpoint()).subscribe(console.log)
+      if(!this.progressOpened)
+        from(this.modalProgress.present()).subscribe(() => this.progressOpened = true);
       this._type.next(type);
       this._step.next(JSON.parse(data).label);
       this._progress.next(JSON.parse(data).percent);
     });
-    this.eventSource.addEventListener('end', (data) => {
-      console.log("oui");
-      this.modalProgress.dismiss();
+    this.eventSource.addEventListener('end', ({data}) => {
+      from(this.modalProgress.dismiss()).subscribe(() => {
+        this.progressOpened = false;
+        from(this.toastController.create({message: `Saved in ${JSON.parse(data).savePath}`})).subscribe(
+          (toast) => toast.present()
+        );
+      });
     });
-    this.eventSource.addEventListener('error', ({data}: any) => {
-      console.log("oui");
-      this.modalProgress.dismiss();
+    this.eventSource.addEventListener('error', ({data}: {data: string}) => {
+      from(this.modalProgress.dismiss()).subscribe(() => {
+        this.progressOpened = false;
+        from(this.toastController.create({message: data})).subscribe(
+          (toast) => toast.present()
+        )
+      });
     });
 
     this.type$.subscribe((type: string) => this.type = type);
@@ -118,7 +122,7 @@ export class HomePage implements OnInit {
 
   disableSelection(node: FileNode): boolean {
     return (this.fileFormat(node)==='videocam-outline' && this.swiper.activeIndex === 1) ||
-    (this.fileFormat(node)==='musical-note-outline' && this.swiper.activeIndex === 0)
+    (this.fileFormat(node)==='musical-notes-outline' && this.swiper.activeIndex === 0)
   }
 
   navigateForward(node: FileNode): void {
@@ -159,13 +163,18 @@ export class HomePage implements OnInit {
       duration: this.typeVideo==='short'?1:this.duration?.value
     }
     this.videosService.createVideo(body).subscribe(
-      () => this.modalProgress.present()
+      () => from(this.modalProgress.present()).subscribe(() => this.progressOpened = true)
     );
   }
 
   cancelVideo(): void {
     this.videosService.cancelVideo().subscribe(
-      () => this.modalProgress.dismiss()
-    )
+      () => from(this.modalProgress.dismiss()).subscribe(() => {
+        this.progressOpened = false;
+        from(this.toastController.create({message: 'Creating video canceled'})).subscribe(
+          (toast) => toast.present()
+        );
+      })
+    );
   }
 }

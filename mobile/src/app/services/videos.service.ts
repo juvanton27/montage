@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class VideosService {
-  private apiUrl = 'http://localhost:3000/api/videos';
+  private apiUrl = 'http://192.168.1.7:3000/api/videos';
 
   constructor(private http: HTTP) { }
 
