@@ -19,7 +19,7 @@ interface DialogData {
 export class AppComponent implements OnInit {
   title = 'frontend';
   dialogRef: any;
-  eventSource = new EventSource('http://localhost:3000/api/videos/sse');
+  eventSource = new EventSource('http://192.168.1.7:3000/api/videos/sse');
 
   private _type: BehaviorSubject<string> = new BehaviorSubject("");
   type$: Observable<string> = this._type.asObservable();

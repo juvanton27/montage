@@ -48,16 +48,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "HomePageModule": () => (/* binding */ HomePageModule)
 /* harmony export */ });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! tslib */ 4929);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/core */ 2560);
-/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/common */ 4666);
-/* harmony import */ var _ionic_angular__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @ionic/angular */ 3819);
-/* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/forms */ 2508);
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! tslib */ 4929);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/common */ 4666);
+/* harmony import */ var _ionic_angular__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @ionic/angular */ 3819);
+/* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @angular/forms */ 2508);
 /* harmony import */ var _home_page__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./home.page */ 2267);
-/* harmony import */ var swiper_angular__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! swiper/angular */ 341);
+/* harmony import */ var swiper_angular__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! swiper/angular */ 341);
 /* harmony import */ var _home_routing_module__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./home-routing.module */ 2003);
 /* harmony import */ var _services_files_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/files.service */ 5095);
 /* harmony import */ var _awesome_cordova_plugins_http_ngx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @awesome-cordova-plugins/http/ngx */ 6123);
+/* harmony import */ var _services_videos_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/videos.service */ 7599);
+
 
 
 
@@ -70,20 +72,20 @@ __webpack_require__.r(__webpack_exports__);
 
 let HomePageModule = class HomePageModule {
 };
-HomePageModule = (0,tslib__WEBPACK_IMPORTED_MODULE_4__.__decorate)([
-    (0,_angular_core__WEBPACK_IMPORTED_MODULE_5__.NgModule)({
+HomePageModule = (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__decorate)([
+    (0,_angular_core__WEBPACK_IMPORTED_MODULE_6__.NgModule)({
         imports: [
-            _angular_common__WEBPACK_IMPORTED_MODULE_6__.CommonModule,
-            _angular_forms__WEBPACK_IMPORTED_MODULE_7__.FormsModule,
-            _ionic_angular__WEBPACK_IMPORTED_MODULE_8__.IonicModule,
+            _angular_common__WEBPACK_IMPORTED_MODULE_7__.CommonModule,
+            _angular_forms__WEBPACK_IMPORTED_MODULE_8__.FormsModule,
+            _ionic_angular__WEBPACK_IMPORTED_MODULE_9__.IonicModule,
             _home_routing_module__WEBPACK_IMPORTED_MODULE_1__.HomePageRoutingModule,
-            swiper_angular__WEBPACK_IMPORTED_MODULE_9__.SwiperModule,
+            swiper_angular__WEBPACK_IMPORTED_MODULE_10__.SwiperModule,
         ],
         declarations: [
             _home_page__WEBPACK_IMPORTED_MODULE_0__.HomePage
         ],
         providers: [
-            _services_files_service__WEBPACK_IMPORTED_MODULE_2__.FilesService, _awesome_cordova_plugins_http_ngx__WEBPACK_IMPORTED_MODULE_3__.HTTP
+            _services_files_service__WEBPACK_IMPORTED_MODULE_2__.FilesService, _services_videos_service__WEBPACK_IMPORTED_MODULE_4__.VideosService, _awesome_cordova_plugins_http_ngx__WEBPACK_IMPORTED_MODULE_3__.HTTP
         ]
     })
 ], HomePageModule);
@@ -102,31 +104,162 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "HomePage": () => (/* binding */ HomePage)
 /* harmony export */ });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tslib */ 4929);
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! tslib */ 4929);
 /* harmony import */ var _home_page_html_ngResource__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./home.page.html?ngResource */ 3853);
 /* harmony import */ var _home_page_scss_ngResource__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./home.page.scss?ngResource */ 1020);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _ionic_angular__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @ionic/angular */ 3819);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ 4505);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs */ 4383);
 /* harmony import */ var _services_files_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/files.service */ 5095);
+/* harmony import */ var _services_videos_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/videos.service */ 7599);
+
+
+
 
 
 
 
 
 let HomePage = class HomePage {
-    constructor(filesService) {
+    constructor(filesService, videosService, toastController) {
         this.filesService = filesService;
+        this.videosService = videosService;
+        this.toastController = toastController;
+        this.path = [];
         this.presentingElement = null;
+        this.progressOpened = false;
+        // Form
+        this.videoPath = "";
+        this.audioPath = "";
+        this.typeVideo = "";
+        // Slider
+        this.swiper = undefined;
+        // SSE
+        this.eventSource = new EventSource('api/videos/sse');
+        this._type = new rxjs__WEBPACK_IMPORTED_MODULE_4__.BehaviorSubject("");
+        this.type$ = this._type.asObservable();
+        this._step = new rxjs__WEBPACK_IMPORTED_MODULE_4__.BehaviorSubject("");
+        this.step$ = this._step.asObservable();
+        this._progress = new rxjs__WEBPACK_IMPORTED_MODULE_4__.BehaviorSubject(0);
+        this.progress$ = this._progress.asObservable();
+        this.type = "";
+        this.step = "";
+        this.progress = 0;
     }
     ngOnInit() {
+        this.eventSource.addEventListener('step', ({ type, data }) => {
+            if (!this.progressOpened)
+                (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.modalProgress.present()).subscribe(() => this.progressOpened = true);
+            this._type.next(type);
+            this._step.next(data);
+        });
+        this.eventSource.addEventListener('progress', ({ type, data }) => {
+            (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.modalProgress?.getCurrentBreakpoint()).subscribe(console.log);
+            if (!this.progressOpened)
+                (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.modalProgress.present()).subscribe(() => this.progressOpened = true);
+            this._type.next(type);
+            this._step.next(JSON.parse(data).label);
+            this._progress.next(JSON.parse(data).percent);
+        });
+        this.eventSource.addEventListener('end', ({ data }) => {
+            (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.modalProgress.dismiss()).subscribe(() => {
+                this.progressOpened = false;
+                (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.toastController.create({ message: `Saved in ${JSON.parse(data).savePath}` })).subscribe((toast) => toast.present());
+            });
+        });
+        this.eventSource.addEventListener('error', ({ data }) => {
+            (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.modalProgress.dismiss()).subscribe(() => {
+                this.progressOpened = false;
+                (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.toastController.create({ message: data })).subscribe((toast) => toast.present());
+            });
+        });
+        this.type$.subscribe((type) => this.type = type);
+        this.step$.subscribe((step) => this.step = step);
+        this.progress$.subscribe((progress) => this.progress = progress);
         this.presentingElement = document.querySelector(':root');
-        this.filesService.getFiles().subscribe(node => { this.files = node; console.log(node); });
+        this.filesService.getFiles().subscribe(node => {
+            this.files = [node];
+            this.currentFolder = this.files;
+        });
+    }
+    onSwiper(swiper) {
+        this.swiper = swiper;
+    }
+    isFile(node) {
+        return node.children === undefined;
+    }
+    fileFormat(node) {
+        if (node.children === undefined) {
+            if (node.name.endsWith('mp3'))
+                return 'musical-notes-outline';
+            if (node.name.endsWith('mp4'))
+                return 'videocam-outline';
+        }
+        return 'folder-outline';
+    }
+    navigateBackward() {
+        this.path.pop();
+        this.currentFolder = this.files;
+        this.path.forEach(p => this.currentFolder = this.currentFolder.find(f => f.name === p).children);
+    }
+    disableSelection(node) {
+        return (this.fileFormat(node) === 'videocam-outline' && this.swiper.activeIndex === 1) ||
+            (this.fileFormat(node) === 'musical-notes-outline' && this.swiper.activeIndex === 0);
+    }
+    navigateForward(node) {
+        if (!this.isFile(node)) {
+            this.path.push(node.name);
+            this.currentFolder = node.children;
+        }
+        else {
+            this.modal.dismiss();
+            const relativePath = this.path.reduce((p, c) => `${p}/${c}`, "") + `/${node.name}`;
+            if (this.swiper.activeIndex === 0)
+                this.filesService.getAbsolutePath(relativePath).subscribe(({ absolutePath }) => this.videoPath = absolutePath);
+            if (this.swiper.activeIndex === 1)
+                this.filesService.getAbsolutePath(relativePath).subscribe(({ absolutePath }) => this.audioPath = absolutePath);
+        }
+    }
+    videoTypeChanged(e) {
+        this.typeVideo = e.detail.value;
+    }
+    formValid() {
+        return this.videoPath !== "" && this.audioPath !== "" && this.title?.value && (this.typeVideo === 'short' || this.duration?.value);
+    }
+    createVideo() {
+        const body = {
+            video: {
+                path: this.videoPath
+            },
+            song: {
+                path: this.audioPath,
+            },
+            outputName: this.title.value,
+            duration: this.typeVideo === 'short' ? 1 : this.duration?.value
+        };
+        this.videosService.createVideo(body).subscribe(() => (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.modalProgress.present()).subscribe(() => this.progressOpened = true));
+    }
+    cancelVideo() {
+        this.videosService.cancelVideo().subscribe(() => (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.modalProgress.dismiss()).subscribe(() => {
+            this.progressOpened = false;
+            (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.from)(this.toastController.create({ message: 'Creating video canceled' })).subscribe((toast) => toast.present());
+        }));
     }
 };
 HomePage.ctorParameters = () => [
-    { type: _services_files_service__WEBPACK_IMPORTED_MODULE_2__.FilesService }
+    { type: _services_files_service__WEBPACK_IMPORTED_MODULE_2__.FilesService },
+    { type: _services_videos_service__WEBPACK_IMPORTED_MODULE_3__.VideosService },
+    { type: _ionic_angular__WEBPACK_IMPORTED_MODULE_6__.ToastController }
 ];
-HomePage = (0,tslib__WEBPACK_IMPORTED_MODULE_3__.__decorate)([
-    (0,_angular_core__WEBPACK_IMPORTED_MODULE_4__.Component)({
+HomePage.propDecorators = {
+    modal: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_7__.ViewChild, args: ['modal',] }],
+    modalProgress: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_7__.ViewChild, args: ['modalProgress',] }],
+    title: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_7__.ViewChild, args: ['title',] }],
+    duration: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_7__.ViewChild, args: ['duration',] }]
+};
+HomePage = (0,tslib__WEBPACK_IMPORTED_MODULE_8__.__decorate)([
+    (0,_angular_core__WEBPACK_IMPORTED_MODULE_7__.Component)({
         selector: 'app-home',
         template: _home_page_html_ngResource__WEBPACK_IMPORTED_MODULE_0__,
         styles: [_home_page_scss_ngResource__WEBPACK_IMPORTED_MODULE_1__]
@@ -160,10 +293,13 @@ __webpack_require__.r(__webpack_exports__);
 let FilesService = class FilesService {
     constructor(http) {
         this.http = http;
-        this.apiUrl = 'api/files';
+        this.apiUrl = 'http://192.168.1.7:3000/api/files';
     }
     getFiles(type) {
-        return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(this.http.get(`${this.apiUrl}?type=${type ? type : ""}`, {}, {})).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.map)(data => data.data));
+        return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(this.http.get(`${this.apiUrl}?type=${type ? type : ""}`, {}, {})).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.map)(data => JSON.parse(data.data)));
+    }
+    getAbsolutePath(relativePath) {
+        return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(this.http.post(`${this.apiUrl}/path`, { relativePath }, {})).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.map)(data => JSON.parse(data.data)));
     }
 };
 FilesService.ctorParameters = () => [
@@ -174,6 +310,51 @@ FilesService = (0,tslib__WEBPACK_IMPORTED_MODULE_3__.__decorate)([
         providedIn: 'root'
     })
 ], FilesService);
+
+
+
+/***/ }),
+
+/***/ 7599:
+/*!********************************************!*\
+  !*** ./src/app/services/videos.service.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "VideosService": () => (/* binding */ VideosService)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! tslib */ 4929);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _awesome_cordova_plugins_http_ngx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @awesome-cordova-plugins/http/ngx */ 6123);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ 4383);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ 6942);
+
+
+
+
+
+let VideosService = class VideosService {
+    constructor(http) {
+        this.http = http;
+        this.apiUrl = 'http://192.168.1.7:3000/api/videos';
+    }
+    createVideo(body) {
+        return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(this.http.post(this.apiUrl, body, {})).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.map)(() => { }));
+    }
+    cancelVideo() {
+        return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.from)(this.http.get(`${this.apiUrl}/cancel`, {}, {})).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.map)(() => { }));
+    }
+};
+VideosService.ctorParameters = () => [
+    { type: _awesome_cordova_plugins_http_ngx__WEBPACK_IMPORTED_MODULE_0__.HTTP }
+];
+VideosService = (0,tslib__WEBPACK_IMPORTED_MODULE_3__.__decorate)([
+    (0,_angular_core__WEBPACK_IMPORTED_MODULE_4__.Injectable)({
+        providedIn: 'root'
+    })
+], VideosService);
 
 
 
@@ -1486,7 +1667,7 @@ function (_super) {
   \************************************************/
 /***/ ((module) => {
 
-module.exports = "#container {\n  text-align: center;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n#container strong {\n  font-size: 20px;\n  line-height: 26px;\n}\n\n#container p {\n  font-size: 16px;\n  line-height: 22px;\n  color: #8c8c8c;\n  margin: 0;\n}\n\n#container a {\n  text-decoration: none;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImhvbWUucGFnZS5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0Usa0JBQUE7RUFFQSxrQkFBQTtFQUNBLE9BQUE7RUFDQSxRQUFBO0VBQ0EsUUFBQTtFQUNBLDJCQUFBO0FBQUY7O0FBR0E7RUFDRSxlQUFBO0VBQ0EsaUJBQUE7QUFBRjs7QUFHQTtFQUNFLGVBQUE7RUFDQSxpQkFBQTtFQUVBLGNBQUE7RUFFQSxTQUFBO0FBRkY7O0FBS0E7RUFDRSxxQkFBQTtBQUZGIiwiZmlsZSI6ImhvbWUucGFnZS5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiI2NvbnRhaW5lciB7XG4gIHRleHQtYWxpZ246IGNlbnRlcjtcblxuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGxlZnQ6IDA7XG4gIHJpZ2h0OiAwO1xuICB0b3A6IDUwJTtcbiAgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKC01MCUpO1xufVxuXG4jY29udGFpbmVyIHN0cm9uZyB7XG4gIGZvbnQtc2l6ZTogMjBweDtcbiAgbGluZS1oZWlnaHQ6IDI2cHg7XG59XG5cbiNjb250YWluZXIgcCB7XG4gIGZvbnQtc2l6ZTogMTZweDtcbiAgbGluZS1oZWlnaHQ6IDIycHg7XG5cbiAgY29sb3I6ICM4YzhjOGM7XG5cbiAgbWFyZ2luOiAwO1xufVxuXG4jY29udGFpbmVyIGEge1xuICB0ZXh0LWRlY29yYXRpb246IG5vbmU7XG59Il19 */";
+module.exports = "#container {\n  text-align: center;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n#container strong {\n  font-size: 20px;\n  line-height: 26px;\n}\n\n#container p {\n  font-size: 16px;\n  line-height: 22px;\n  color: #8c8c8c;\n  margin: 0;\n}\n\n#container a {\n  text-decoration: none;\n}\n\nswiper {\n  height: 100%;\n}\n\n.btn-file {\n  margin: auto;\n  width: 50vw;\n}\n\n.title-file {\n  margin: auto;\n  width: 90vw;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImhvbWUucGFnZS5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0Usa0JBQUE7RUFFQSxrQkFBQTtFQUNBLE9BQUE7RUFDQSxRQUFBO0VBQ0EsUUFBQTtFQUNBLDJCQUFBO0FBQUY7O0FBR0E7RUFDRSxlQUFBO0VBQ0EsaUJBQUE7QUFBRjs7QUFHQTtFQUNFLGVBQUE7RUFDQSxpQkFBQTtFQUVBLGNBQUE7RUFFQSxTQUFBO0FBRkY7O0FBS0E7RUFDRSxxQkFBQTtBQUZGOztBQUtBO0VBQ0UsWUFBQTtBQUZGOztBQUtBO0VBQ0UsWUFBQTtFQUNBLFdBQUE7QUFGRjs7QUFLQTtFQUNFLFlBQUE7RUFDQSxXQUFBO0FBRkYiLCJmaWxlIjoiaG9tZS5wYWdlLnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIjY29udGFpbmVyIHtcbiAgdGV4dC1hbGlnbjogY2VudGVyO1xuXG4gIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgbGVmdDogMDtcbiAgcmlnaHQ6IDA7XG4gIHRvcDogNTAlO1xuICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoLTUwJSk7XG59XG5cbiNjb250YWluZXIgc3Ryb25nIHtcbiAgZm9udC1zaXplOiAyMHB4O1xuICBsaW5lLWhlaWdodDogMjZweDtcbn1cblxuI2NvbnRhaW5lciBwIHtcbiAgZm9udC1zaXplOiAxNnB4O1xuICBsaW5lLWhlaWdodDogMjJweDtcblxuICBjb2xvcjogIzhjOGM4YztcblxuICBtYXJnaW46IDA7XG59XG5cbiNjb250YWluZXIgYSB7XG4gIHRleHQtZGVjb3JhdGlvbjogbm9uZTtcbn1cblxuc3dpcGVyIHtcbiAgaGVpZ2h0OiAxMDAlO1xufVxuXG4uYnRuLWZpbGUge1xuICBtYXJnaW46IGF1dG87XG4gIHdpZHRoOiA1MHZ3O1xufVxuXG4udGl0bGUtZmlsZSB7XG4gIG1hcmdpbjogYXV0bztcbiAgd2lkdGg6IDkwdnc7XG59Il19 */";
 
 /***/ }),
 
@@ -1496,7 +1677,7 @@ module.exports = "#container {\n  text-align: center;\n  position: absolute;\n  
   \************************************************/
 /***/ ((module) => {
 
-module.exports = "<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n      Montage\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content [fullscreen]=\"true\">\n  <swiper [keyboard]=\"true\" [pagination]=\"true\" [scrollbar]=\"true\" [zoom]=\"true\">\n    <ng-template swiperSlide>\n      <h1>Add a video</h1>\n      <ion-button expand=\"block\" (click)=\"modal.present()\">Chose a file</ion-button>\n    </ng-template>\n    <ng-template swiperSlide>\n      <h1>Add a song</h1>\n      <ion-button expand=\"block\" (click)=\"modal.present()\">Chose a file</ion-button>\n    </ng-template>\n    <ng-template swiperSlide>\n      <h1>Fill informations</h1>\n    </ng-template>\n    <ng-template swiperSlide>\n      <h1>Verify</h1>\n    </ng-template>\n  </swiper>\n</ion-content>\n<ion-modal #modal [canDismiss]=\"true\" [presentingElement]=\"presentingElement\">\n  <ng-template>\n    <ion-header>\n      <ion-toolbar>\n        <ion-title>Modal</ion-title>\n        <ion-buttons slot=\"end\">\n          <ion-button (click)=\"modal.dismiss()\">Close</ion-button>\n        </ion-buttons>\n      </ion-toolbar>\n    </ion-header>\n    <ion-content>\n      <ion-list>\n        <ion-item *ngFor=\"let node of files\">\n          <ion-label>{{ node.name }}</ion-label>\n        </ion-item>\n      </ion-list>\n    </ion-content>\n  </ng-template>\n</ion-modal>\n\n";
+module.exports = "<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n      Montage\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<!-- SLIDER -->\n<ion-content [fullscreen]=\"true\">\n  <swiper (swiper)=\"onSwiper($event)\">\n    <ng-template swiperSlide>\n      <div>\n        <h1>Add a video</h1>\n        <p class=\"title-file\">{{ videoPath }}</p>\n        <ion-button class=\"btn-file\" expand=\"block\" (click)=\"modal.present()\">Chose a file</ion-button>  \n      </div>\n    </ng-template>\n    <ng-template swiperSlide>\n      <div>\n        <h1>Add a song</h1>\n        <p class=\"title-file\">{{ audioPath }}</p>\n        <ion-button class=\"btn-file\" expand=\"block\" (click)=\"modal.present()\">Chose a file</ion-button>\n      </div>\n    </ng-template>\n    <ng-template swiperSlide>\n      <div>\n        <h1>Fill informations</h1>\n        <ion-input #title placeholder=\"Title\"></ion-input>\n        <ion-segment (ionChange)=\"videoTypeChanged($event)\">\n          <ion-segment-button value=\"vod\">\n            <ion-label>VOD</ion-label>\n          </ion-segment-button>\n          <ion-segment-button value=\"short\">\n            <ion-label>Short</ion-label>\n          </ion-segment-button>\n        </ion-segment>\n        <ion-input #duration *ngIf=\"typeVideo==='vod'\" type=\"number\" placeholder=\"Duration\"></ion-input>\n      </div>\n    </ng-template>\n    <ng-template swiperSlide>\n      <div>\n        <h1>Verify video informations</h1>\n        <ion-grid>\n          <ion-row>\n            <ion-col size=\"6\">\n              <ion-icon *ngIf=\"videoPath\" name=\"videocam-outline\"></ion-icon>\n            </ion-col>\n            <ion-col size=\"6\">\n              <ion-icon *ngIf=\"audioPath\" name=\"musical-notes-outline\"></ion-icon>\n            </ion-col>\n            <ion-col size=\"6\">\n              {{ title?.value }}\n              <ion-icon name=\"attach-outline\"></ion-icon>\n            </ion-col>\n            <ion-col size=\"6\">\n              {{ typeVideo==='short'?1:duration?.value }}\n              <ion-icon name=\"time-outline\"></ion-icon>\n            </ion-col>\n          </ion-row>\n        </ion-grid>\n        <ion-button class=\"btn-file\" expand=\"block\" [disabled]=\"!formValid()\" (click)=\"createVideo()\">Create video</ion-button>\n      </div>\n    </ng-template>\n  </swiper>\n</ion-content>\n\n<!-- FILE EXPLORER MODAL -->\n<ion-modal #modal [canDismiss]=\"true\" [presentingElement]=\"presentingElement\">\n  <ng-template>\n    <ion-header>\n      <ion-toolbar>\n        <ion-buttons *ngIf=\"path.length > 0\" slot=\"start\">\n          <ion-button (click)=\"navigateBackward()\">\n            <ion-icon name=\"chevron-back-outline\"></ion-icon>\n            {{ path[path.length-1] }}\n          </ion-button>\n        </ion-buttons>\n        <ion-title>Modal</ion-title>\n        <ion-buttons slot=\"end\">\n          <ion-button (click)=\"modal.dismiss()\">Close</ion-button>\n        </ion-buttons>\n      </ion-toolbar>\n    </ion-header>\n    <ion-content>\n      <ion-nav root=\"nav-home\">\n        <ion-list>\n          <ion-item *ngFor=\"let node of currentFolder\" \n            (click)=\"navigateForward(node)\" \n            [button]=\"!isFile(node)\" \n            [detail]=\"!isFile(node)\"\n            [disabled]=\"disableSelection(node)\"\n          >\n            <ion-icon [name]=\"fileFormat(node)\" slot=\"start\"></ion-icon>\n            <ion-label>\n              {{ node.name }}\n            </ion-label>\n          </ion-item>\n        </ion-list>\n      </ion-nav>\n    </ion-content>\n  </ng-template>\n</ion-modal>\n\n<!-- PROGRESS MODAL -->\n<ion-modal #modalProgress [canDismiss]=\"true\">\n  <ng-template>\n    <ion-header>\n      <ion-toolbar>\n        <ion-title>{{ step }}</ion-title>\n        <ion-buttons slot=\"end\">\n          <ion-button (click)=\"cancelVideo()\">Cancel</ion-button>\n        </ion-buttons>\n      </ion-toolbar>\n    </ion-header>\n    <ion-content>\n      <div class=\"progress\">\n        <ion-spinner *ngIf=\"type==='step'\"></ion-spinner>\n        <ion-progress-bar *ngIf=\"type==='progress'\" [value]=\"progress/100\"></ion-progress-bar>\n      </div>\n    </ion-content>\n  </ng-template>\n</ion-modal>\n\n";
 
 /***/ }),
 
